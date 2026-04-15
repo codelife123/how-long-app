@@ -1,15 +1,36 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Pressable, Animated, Easing } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { ScreenLayout } from '../components/ScreenLayout';
 import { COLORS, TYPOGRAPHY, SHADOWS } from '../theme/theme';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'GetReady'>;
 
 export default function GetReadyScreen({ navigation, route }: Props) {
   const { durationLabel, durationMs } = route.params;
+
+  const buttonScale = useRef(new Animated.Value(1)).current;
+  const rippleScale = useRef(new Animated.Value(1)).current;
+  const rippleOpacity = useRef(new Animated.Value(0.4)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(buttonScale, { toValue: 1.05, duration: 1500, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
+        Animated.timing(buttonScale, { toValue: 1, duration: 1500, useNativeDriver: true, easing: Easing.inOut(Easing.ease) })
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.parallel([
+        Animated.timing(rippleScale, { toValue: 2, duration: 2000, useNativeDriver: true, easing: Easing.out(Easing.ease) }),
+        Animated.timing(rippleOpacity, { toValue: 0, duration: 2000, useNativeDriver: true, easing: Easing.out(Easing.ease) })
+      ])
+    ).start();
+  }, [buttonScale, rippleScale, rippleOpacity]);
 
   const handleStart = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -28,15 +49,26 @@ export default function GetReadyScreen({ navigation, route }: Props) {
           </Text>
         </View>
 
-        <Pressable 
-          style={({ pressed }) => [
-            styles.startButton,
-            pressed && { transform: [{ scale: 0.95 }] }
-          ]}
-          onPress={handleStart}
-        >
-          <Text style={styles.startText}>START</Text>
-        </Pressable>
+        <View style={styles.buttonContainer}>
+          <Animated.View style={[styles.rippleRing, { transform: [{ scale: rippleScale }], opacity: rippleOpacity }]} />
+
+          <Animated.View style={[styles.innerAnimatedBtn, { transform: [{ scale: buttonScale }] }]}>
+            <Pressable 
+              onPress={handleStart}
+              style={({ pressed }) => [
+                styles.pressableArea,
+                pressed && { opacity: 0.8 }
+              ]}
+            >
+              <LinearGradient
+                colors={[COLORS.primary, COLORS.primaryContainer]}
+                style={styles.gradientFill}
+              >
+                <Text style={styles.startText}>START</Text>
+              </LinearGradient>
+            </Pressable>
+          </Animated.View>
+        </View>
       </View>
     </ScreenLayout>
   );
@@ -59,21 +91,45 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   targetText: {
-    color: COLORS.primary,
+    color: COLORS.onSurfaceVariant,
     textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+    fontWeight: 'bold',
   },
-  startButton: {
+  buttonContainer: {
     width: 140,
     height: 140,
-    borderRadius: 70, // rounded-full
-    backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 60,
-    ...SHADOWS.ambientGlow,
+    marginBottom: 80,
+  },
+  rippleRing: {
+    position: 'absolute',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: COLORS.primary,
+  },
+  innerAnimatedBtn: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    ...SHADOWS.glowSelected,
+  },
+  pressableArea: {
+    flex: 1,
+    borderRadius: 70,
+    overflow: 'hidden',
+  },
+  gradientFill: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   startText: {
     ...TYPOGRAPHY.titleLg,
-    color: COLORS.onPrimary,
+    color: '#000',
+    letterSpacing: 1.5,
   }
 });

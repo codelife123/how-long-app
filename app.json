@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "howlong",
-    "slug": "howlong",
+    "slug": "how-long",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,6 +28,12 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c76d12f6-9da7-45b6-a9d9-356fff073277"
+      }
+    },
+    "owner": "nodedevloper"
   }
 }
