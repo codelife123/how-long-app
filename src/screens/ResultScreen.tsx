@@ -128,7 +128,7 @@ export default function ResultScreen({ navigation, route }: Props) {
     ? 'rgba(176, 145, 255, 0.05)'
     : 'rgba(76, 100, 91, 0.04)';
 
-  const statusWord = diffSec === 0 ? 'perfect' : diffSec < 0 ? 'early' : 'late';
+  const statusWord = absDiff < 0.05 ? 'spot on!' : diffSec < 0 ? 'early' : 'late';
 
   // ─── Shareable Image Card (rendered off-screen, captured by ViewShot) ───
   const ShareableCard = () => (

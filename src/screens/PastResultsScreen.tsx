@@ -36,8 +36,8 @@ export default function PastResultsScreen({ navigation }: Props) {
     let statusText = '';
     let dotColor = '';
 
-    if (diffSec === 0) {
-      statusText = 'Perfect!';
+    if (absDiff < 0.05) {
+      statusText = 'Spot on!';
       dotColor = colors.tertiaryContainer;
     } else if (diffSec < 0) {
       statusText = `${absDiff.toFixed(2)}s early`;
