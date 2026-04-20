@@ -105,18 +105,27 @@ export default function HomeScreen({ navigation }: Props) {
                 key={d.label}
                 style={({ pressed }) => [
                   styles.card,
-                  { backgroundColor: colors.surfaceContainerHigh },
+                  // Zen: surface-container-low (#f0f4f4), Dark: surfaceContainerHigh
+                  { backgroundColor: mode === 'zen' ? colors.surfaceContainerLow : colors.surfaceContainerHigh },
                   pressed && { transform: [{ scale: 0.98 }] },
-                  pressed && { backgroundColor: colors.primaryContainer, ...shadows.glowSelected },
+                  pressed && { backgroundColor: mode === 'zen' ? colors.surfaceContainerHighest : colors.primaryContainer, ...shadows.glowSelected },
                 ]}
                 onPress={() => handleSelect(d)}
               >
+                {/* Time label — primary green in Zen, onSurface in Dark */}
+                <Text style={[TYPOGRAPHY.displaySm, styles.cardTimeLabel, { color: mode === 'zen' ? colors.primary : colors.onSurface }]}>{d.label}</Text>
+
+                {/* PB badge — grey pill in Zen, tertiaryContainer in Dark */}
                 {pbValue !== null && pbValue !== undefined && (
-                  <View style={[styles.pbBadge, { backgroundColor: colors.tertiaryContainer }]}>
-                    <Text style={[styles.pbText, { color: mode === 'dark' ? '#000000' : '#034853' }]}>PB: ±{(pbValue / 1000).toFixed(2)}s</Text>
+                  <View style={[
+                    styles.pbBadge,
+                    { backgroundColor: mode === 'zen' ? colors.surfaceContainer : colors.tertiaryContainer }
+                  ]}>
+                    <Text style={[styles.pbText, { color: mode === 'zen' ? colors.onSurfaceVariant : '#034853' }]}>
+                      PB: ±{(pbValue / 1000).toFixed(2)}s
+                    </Text>
                   </View>
                 )}
-                <Text style={[TYPOGRAPHY.displaySm, { color: colors.onSurface }]}>{d.label}</Text>
               </Pressable>
             );
           })}
@@ -171,16 +180,22 @@ const styles = StyleSheet.create({
     width: '45%',
     aspectRatio: 1,
     borderRadius: 24,
-    padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 20,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+    overflow: 'hidden',
+  },
+  cardTimeLabel: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
   pbBadge: {
     position: 'absolute',
     top: 12,
     left: 12,
     borderRadius: 16,
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
   },
   pbText: {
