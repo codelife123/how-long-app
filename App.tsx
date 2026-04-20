@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RootStackParamList } from './src/types/navigation';
-import { COLORS, TYPOGRAPHY } from './src/theme/theme';
+import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
 
 import { 
   useFonts,
@@ -27,6 +27,30 @@ import PastResultsScreen from './src/screens/PastResultsScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+function AppNavigator() {
+  const { colors } = useTheme();
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+          animation: 'fade',
+        }}
+        initialRouteName="Home"
+      >
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="HowToPlay" component={HowToPlayScreen} />
+        <Stack.Screen name="PastResults" component={PastResultsScreen} />
+        <Stack.Screen name="GetReady" component={GetReadyScreen} />
+        <Stack.Screen name="ActiveCounting" component={ActiveCountingScreen} />
+        <Stack.Screen name="Result" component={ResultScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
 export default function App() {
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_700Bold,
@@ -37,30 +61,16 @@ export default function App() {
 
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, backgroundColor: COLORS.background, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ flex: 1, backgroundColor: '#0d0d1a', alignItems: 'center', justifyContent: 'center' }}>
       </View>
     );
   }
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: COLORS.background },
-            animation: 'fade', // cinematic motion
-          }}
-          initialRouteName="Home"
-        >
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="HowToPlay" component={HowToPlayScreen} />
-          <Stack.Screen name="PastResults" component={PastResultsScreen} />
-          <Stack.Screen name="GetReady" component={GetReadyScreen} />
-          <Stack.Screen name="ActiveCounting" component={ActiveCountingScreen} />
-          <Stack.Screen name="Result" component={ResultScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <ThemeProvider>
+        <AppNavigator />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

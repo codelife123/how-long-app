@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
-export const COLORS = {
+// ─── Color Palettes ──────────────────────────────────────────────
+export const DARK_COLORS = {
   background: '#0d0d1a',
   surface: '#0d0d1a',
   surfaceContainerLowest: '#000000',
@@ -8,17 +9,48 @@ export const COLORS = {
   surfaceContainer: '#181828',
   surfaceContainerHigh: '#1e1e2f',
   surfaceContainerHighest: '#242437',
-  surfaceVariant: 'rgba(36, 36, 55, 0.4)', // 40% surface_variant for glass
+  surfaceVariant: 'rgba(36, 36, 55, 0.4)',
   primary: '#aba3ff',
   primaryContainer: '#9c94fd',
   primaryDim: '#9991fa',
   onPrimary: '#281a82',
   onSurface: '#e9e6f9',
   onSurfaceVariant: '#aba9bb',
-  outlineVariant: 'rgba(71, 70, 86, 0.15)', // 15% opacity ghost border
+  outlineVariant: 'rgba(71, 70, 86, 0.15)',
   tertiaryContainer: '#f682bd',
+  error: '#ff6e84',
+  secondary: '#b091ff',
+  tertiary: '#ff94c9',
 };
 
+export const ZEN_COLORS = {
+  background: '#f8fafa',
+  surface: '#f8fafa',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f0f4f4',
+  surfaceContainer: '#eaefef',
+  surfaceContainerHigh: '#e3e9ea',
+  surfaceContainerHighest: '#dde4e4',
+  surfaceVariant: 'rgba(221, 228, 228, 0.6)',
+  primary: '#2d6957',
+  primaryContainer: '#b1efd8',
+  primaryDim: '#1f5d4b',
+  onPrimary: '#e4fff3',
+  onSurface: '#2c3435',
+  onSurfaceVariant: '#596061',
+  outlineVariant: 'rgba(172, 179, 180, 0.15)',
+  tertiaryContainer: '#b7eefc',
+  error: '#a83836',
+  secondary: '#4c645b',
+  tertiary: '#2f6772',
+};
+
+export type ThemeColors = typeof DARK_COLORS;
+
+// Keep backward-compatible default export
+export const COLORS = DARK_COLORS;
+
+// ─── Fonts ───────────────────────────────────────────────────────
 export const FONTS = {
   display: 'PlusJakartaSans_700Bold',
   headline: 'PlusJakartaSans_700Bold',
@@ -27,68 +59,89 @@ export const FONTS = {
   label: 'Manrope_600SemiBold',
 };
 
+// ─── Typography (color-neutral – screens override colors dynamically) ─
 export const TYPOGRAPHY = StyleSheet.create({
   displayLg: {
     fontFamily: FONTS.display,
-    fontSize: 56, // 3.5rem roughly
+    fontSize: 56,
     lineHeight: 64,
-    color: COLORS.onSurface,
+    color: DARK_COLORS.onSurface,
   },
   displaySm: {
     fontFamily: FONTS.display,
     fontSize: 32,
     lineHeight: 40,
-    color: COLORS.onSurface,
+    color: DARK_COLORS.onSurface,
   },
   headlineLg: {
     fontFamily: FONTS.headline,
     fontSize: 32,
     lineHeight: 40,
-    color: COLORS.onSurface,
+    color: DARK_COLORS.onSurface,
   },
   bodyLg: {
     fontFamily: FONTS.body,
     fontSize: 18,
     lineHeight: 28,
-    color: COLORS.onSurfaceVariant,
+    color: DARK_COLORS.onSurfaceVariant,
   },
   bodyMd: {
     fontFamily: FONTS.body,
     fontSize: 16,
     lineHeight: 24,
-    color: COLORS.onSurfaceVariant,
+    color: DARK_COLORS.onSurfaceVariant,
   },
   labelSm: {
     fontFamily: FONTS.label,
     fontSize: 12,
     lineHeight: 16,
-    color: COLORS.onSurfaceVariant,
+    color: DARK_COLORS.onSurfaceVariant,
     letterSpacing: 0.5,
   },
   titleLg: {
     fontFamily: FONTS.bodyBold,
     fontSize: 22,
     lineHeight: 28,
-    color: COLORS.onSurface,
+    color: DARK_COLORS.onSurface,
   }
 });
 
-export const SHADOWS = StyleSheet.create({
+// ─── Shadows ─────────────────────────────────────────────────────
+export const DARK_SHADOWS = StyleSheet.create({
   ambientGlow: {
-    shadowColor: COLORS.primary,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.2, // Tamed to work across platforms
+    shadowColor: DARK_COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
     shadowRadius: 30,
     elevation: 10,
   },
   glowSelected: {
-    shadowColor: COLORS.primary,
+    shadowColor: DARK_COLORS.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
     shadowRadius: 15,
     elevation: 8,
   }
 });
+
+export const ZEN_SHADOWS = StyleSheet.create({
+  ambientGlow: {
+    shadowColor: ZEN_COLORS.primary,
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.08,
+    shadowRadius: 40,
+    elevation: 6,
+  },
+  glowSelected: {
+    shadowColor: ZEN_COLORS.primary,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    elevation: 4,
+  }
+});
+
+export type ThemeShadows = typeof DARK_SHADOWS;
+
+// Keep backward-compatible default
+export const SHADOWS = DARK_SHADOWS;

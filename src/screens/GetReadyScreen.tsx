@@ -3,13 +3,15 @@ import { View, Text, StyleSheet, Pressable, Animated, Easing } from 'react-nativ
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { ScreenLayout } from '../components/ScreenLayout';
-import { COLORS, TYPOGRAPHY, SHADOWS } from '../theme/theme';
+import { TYPOGRAPHY } from '../theme/theme';
+import { useTheme } from '../theme/ThemeContext';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'GetReady'>;
 
 export default function GetReadyScreen({ navigation, route }: Props) {
+  const { colors, shadows } = useTheme();
   const { durationLabel, durationMs } = route.params;
 
   const buttonScale = useRef(new Animated.Value(1)).current;
@@ -41,18 +43,18 @@ export default function GetReadyScreen({ navigation, route }: Props) {
     <ScreenLayout>
       <View style={styles.content}>
         <View style={styles.centerBox}>
-          <Text style={[TYPOGRAPHY.headlineLg, styles.instructions]}>
+          <Text style={[TYPOGRAPHY.headlineLg, styles.instructions, { color: colors.onSurface }]}>
             Close your eyes, feel the time.
           </Text>
-          <Text style={[TYPOGRAPHY.bodyLg, styles.targetText]}>
+          <Text style={[TYPOGRAPHY.bodyLg, styles.targetText, { color: colors.onSurfaceVariant }]}>
             Target: {durationLabel}
           </Text>
         </View>
 
         <View style={styles.buttonContainer}>
-          <Animated.View style={[styles.rippleRing, { transform: [{ scale: rippleScale }], opacity: rippleOpacity }]} />
+          <Animated.View style={[styles.rippleRing, { backgroundColor: colors.primary, transform: [{ scale: rippleScale }], opacity: rippleOpacity }]} />
 
-          <Animated.View style={[styles.innerAnimatedBtn, { transform: [{ scale: buttonScale }] }]}>
+          <Animated.View style={[styles.innerAnimatedBtn, shadows.glowSelected, { transform: [{ scale: buttonScale }] }]}>
             <Pressable 
               onPress={handleStart}
               style={({ pressed }) => [
@@ -61,10 +63,10 @@ export default function GetReadyScreen({ navigation, route }: Props) {
               ]}
             >
               <LinearGradient
-                colors={[COLORS.primary, COLORS.primaryContainer]}
+                colors={[colors.primary, colors.primaryContainer]}
                 style={styles.gradientFill}
               >
-                <Text style={styles.startText}>START</Text>
+                <Text style={[styles.startText, { color: colors.onPrimary }]}>START</Text>
               </LinearGradient>
             </Pressable>
           </Animated.View>
@@ -91,7 +93,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   targetText: {
-    color: COLORS.onSurfaceVariant,
     textAlign: 'center',
     textTransform: 'uppercase',
     letterSpacing: 2,
@@ -109,13 +110,11 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: COLORS.primary,
   },
   innerAnimatedBtn: {
     width: 140,
     height: 140,
     borderRadius: 70,
-    ...SHADOWS.glowSelected,
   },
   pressableArea: {
     flex: 1,
@@ -129,7 +128,6 @@ const styles = StyleSheet.create({
   },
   startText: {
     ...TYPOGRAPHY.titleLg,
-    color: '#000',
     letterSpacing: 1.5,
   }
 });

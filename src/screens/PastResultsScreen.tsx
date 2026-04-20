@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { ScreenLayout } from '../components/ScreenLayout';
-import { COLORS, TYPOGRAPHY, SHADOWS } from '../theme/theme';
+import { TYPOGRAPHY } from '../theme/theme';
+import { useTheme } from '../theme/ThemeContext';
 import { getHistory, HistoryEntry } from '../utils/storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
@@ -12,6 +13,7 @@ import * as Haptics from 'expo-haptics';
 type Props = NativeStackScreenProps<RootStackParamList, 'PastResults'>;
 
 export default function PastResultsScreen({ navigation }: Props) {
+  const { colors, shadows, mode } = useTheme();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const isFocused = useIsFocused();
 
@@ -36,80 +38,96 @@ export default function PastResultsScreen({ navigation }: Props) {
 
     if (diffSec === 0) {
       statusText = 'Perfect!';
-      dotColor = COLORS.tertiaryContainer;
+      dotColor = colors.tertiaryContainer;
     } else if (diffSec < 0) {
       statusText = `${absDiff.toFixed(2)}s early`;
-      dotColor = COLORS.primary;
+      dotColor = colors.primary;
     } else if (diffSec > 2) {
       statusText = `${absDiff.toFixed(2)}s late`;
-      dotColor = '#ff6e84'; // error
+      dotColor = colors.error;
     } else {
       statusText = `${absDiff.toFixed(2)}s late`;
-      dotColor = '#aa8cf9'; // secondary-dim
+      dotColor = mode === 'dark' ? '#aa8cf9' : '#4c645b';
     }
 
     return (
-      <View key={item.id} style={styles.historyCard}>
-        <View style={styles.targetCol}>
-          <Text style={[TYPOGRAPHY.headlineLg, { color: COLORS.primary }]}>{item.durationLabel}</Text>
-          <Text style={styles.targetLabel}>TARGET</Text>
-        </View>
+      <Pressable 
+        key={item.id} 
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          navigation.navigate('Result', {
+            durationLabel: item.durationLabel,
+            durationMs: item.durationMs,
+            guessedMs: item.guessedMs,
+            fromHistory: true,
+          });
+        }}
+        style={({pressed}) => [pressed && {opacity: 0.8, transform: [{scale: 0.98}]}]}
+      >
+        <View style={[styles.historyCard, { backgroundColor: colors.surfaceContainerHigh, borderColor: mode === 'dark' ? 'rgba(71, 70, 86, 0.1)' : 'rgba(172, 179, 180, 0.1)' }]}>
+          <View style={styles.targetCol}>
+            <Text style={[TYPOGRAPHY.headlineLg, { color: colors.primary }]}>{item.durationLabel}</Text>
+            <Text style={[styles.targetLabel, { color: colors.onSurfaceVariant }]}>TARGET</Text>
+          </View>
 
-        <View style={styles.infoCol}>
-          <Text style={[TYPOGRAPHY.titleLg, { color: diffSec === 0 ? COLORS.tertiaryContainer : COLORS.onSurface }]}>
-            {statusText}
-          </Text>
-          <Text style={styles.timeLabel}>
-             {new Date(item.timestamp).toLocaleString(undefined, {
-               month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-             })}
-          </Text>
-        </View>
+          <View style={styles.infoCol}>
+            <Text style={[TYPOGRAPHY.titleLg, { color: diffSec === 0 ? colors.tertiaryContainer : colors.onSurface }]}>
+              {statusText}
+            </Text>
+            <Text style={[styles.timeLabel, { color: colors.onSurfaceVariant }]}>
+               {new Date(item.timestamp).toLocaleString(undefined, {
+                 month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+               })}
+            </Text>
+          </View>
 
-        <View style={styles.dotContainer}>
-           <View style={[styles.dot, { backgroundColor: dotColor, shadowColor: dotColor }]} />
+          <View style={styles.dotContainer}>
+             <View style={[styles.dot, { backgroundColor: dotColor, shadowColor: dotColor }]} />
+          </View>
         </View>
-      </View>
+      </Pressable>
     );
   };
+
+  const iconCircleBg = mode === 'dark' ? 'rgba(171, 163, 255, 0.2)' : 'rgba(45, 105, 87, 0.15)';
 
   return (
     <ScreenLayout>
       <View style={styles.header}>
          <Pressable onPress={handleClose} style={styles.iconBtn}>
-            <MaterialIcons name="arrow-back" size={24} color={COLORS.primary} />
+            <MaterialIcons name="arrow-back" size={24} color={colors.primary} />
          </Pressable>
-         <Text style={[TYPOGRAPHY.titleLg, { flex: 1, textAlign: 'center' }]}>History</Text>
+         <Text style={[TYPOGRAPHY.titleLg, { flex: 1, textAlign: 'center', color: colors.onSurface }]}>History</Text>
          <View style={styles.iconBtn}>
-            <MaterialIcons name="history" size={24} color={COLORS.primary} />
+            <MaterialIcons name="history" size={24} color={colors.primary} />
          </View>
       </View>
 
       <View style={styles.titleContainer}>
-         <Text style={styles.sessionLabel}>Session Analytics</Text>
-         <Text style={TYPOGRAPHY.displaySm}>Past Results</Text>
+         <Text style={[styles.sessionLabel, { color: colors.onSurfaceVariant }]}>Session Analytics</Text>
+         <Text style={[TYPOGRAPHY.displaySm, { color: colors.onSurface }]}>Past Results</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {history.map(renderHistoryItem)}
 
         {history.length > 0 && (
-          <View style={styles.insightCard}>
-            <View style={styles.insightIconWrapper}>
-              <MaterialIcons name="insights" size={24} color={COLORS.primary} />
+          <View style={[styles.insightCard, { backgroundColor: colors.surfaceVariant }]}>
+            <View style={[styles.insightIconWrapper, { backgroundColor: iconCircleBg }]}>
+              <MaterialIcons name="insights" size={24} color={colors.primary} />
             </View>
             <View>
-               <Text style={[TYPOGRAPHY.titleLg, {fontSize: 16}]}>Precision Status</Text>
-               <Text style={TYPOGRAPHY.bodyMd}>You have played {history.length} games</Text>
+               <Text style={[TYPOGRAPHY.titleLg, {fontSize: 16, color: colors.onSurface}]}>Precision Status</Text>
+               <Text style={[TYPOGRAPHY.bodyMd, { color: colors.onSurfaceVariant }]}>You have played {history.length} games</Text>
             </View>
           </View>
         )}
       </ScrollView>
 
-      <View style={styles.footer}>
-        <Pressable style={({pressed}) => [styles.backBtn, pressed && {transform: [{scale: 0.95}]}]} onPress={handleClose}>
-          <Text style={styles.backBtnText}>Back to Timer</Text>
-          <MaterialIcons name="close" size={24} color="#000000" />
+      <View style={[styles.footer, { backgroundColor: colors.background }]}>
+        <Pressable style={({pressed}) => [styles.backBtn, { backgroundColor: colors.primary, ...shadows.glowSelected }, pressed && {transform: [{scale: 0.95}]}]} onPress={handleClose}>
+          <Text style={[styles.backBtnText, { color: colors.onPrimary }]}>Back to Timer</Text>
+          <MaterialIcons name="close" size={24} color={colors.onPrimary} />
         </Pressable>
       </View>
     </ScreenLayout>
@@ -143,10 +161,8 @@ const styles = StyleSheet.create({
   },
   historyCard: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surfaceContainerHigh,
     padding: 20,
     borderRadius: 16,
-    borderColor: 'rgba(71, 70, 86, 0.1)',
     borderWidth: 1,
     alignItems: 'center',
   },
@@ -182,7 +198,6 @@ const styles = StyleSheet.create({
   },
   insightCard: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surfaceVariant,
     padding: 24,
     borderRadius: 16,
     marginTop: 16,
@@ -193,7 +208,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(171, 163, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -205,20 +219,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 40,
     paddingTop: 24,
-    backgroundColor: COLORS.background, // simple gradient fallback
   },
   backBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
     paddingHorizontal: 40,
     paddingVertical: 18,
     borderRadius: 30,
     gap: 12,
-    ...SHADOWS.glowSelected,
   },
   backBtnText: {
     ...TYPOGRAPHY.titleLg,
-    color: '#000',
   }
 });

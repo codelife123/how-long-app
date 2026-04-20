@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Pressable, Animated, Easing } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { ScreenLayout } from '../components/ScreenLayout';
-import { COLORS, TYPOGRAPHY, SHADOWS } from '../theme/theme';
+import { TYPOGRAPHY } from '../theme/theme';
+import { useTheme } from '../theme/ThemeContext';
 import { getPB } from '../utils/storage';
 import { useIsFocused } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
@@ -23,8 +24,30 @@ const DURATIONS = [
 ];
 
 export default function HomeScreen({ navigation }: Props) {
+  const { colors, shadows, mode, toggleMode } = useTheme();
   const [pbs, setPbs] = useState<Record<string, number | null>>({});
   const isFocused = useIsFocused();
+
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.05,
+          duration: 1000,
+          useNativeDriver: true,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+          easing: Easing.inOut(Easing.ease),
+        }),
+      ])
+    ).start();
+  }, [pulseAnim]);
 
   useEffect(() => {
     if (isFocused) {
@@ -51,17 +74,28 @@ export default function HomeScreen({ navigation }: Props) {
   return (
     <ScreenLayout>
       <View style={styles.topBar}>
+        {/* Theme toggle */}
+        <Pressable 
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); toggleMode(); }}
+          style={({pressed}) => [pressed && {opacity: 0.7}]}
+        >
+          <MaterialIcons 
+            name={mode === 'dark' ? 'light-mode' : 'dark-mode'} 
+            size={28} 
+            color={colors.primary} 
+          />
+        </Pressable>
         <View style={{flex: 1}} />
         <Pressable 
           onPress={() => navigation.navigate('PastResults')} 
           style={({pressed}) => [pressed && {opacity: 0.7}]}
         >
-          <MaterialIcons name="history" size={28} color={COLORS.primary} />
+          <MaterialIcons name="history" size={28} color={colors.primary} />
         </Pressable>
       </View>
       <View style={styles.content}>
-        <Text style={[TYPOGRAPHY.headlineLg, styles.title]}>How Long?</Text>
-        <Text style={[TYPOGRAPHY.bodyMd, styles.subtitle]}>Select a duration and trust your internal clock.</Text>
+        <Text style={[TYPOGRAPHY.headlineLg, styles.title, { color: colors.onSurface }]}>How Long?</Text>
+        <Text style={[TYPOGRAPHY.bodyMd, styles.subtitle, { color: colors.onSurfaceVariant }]}>Select a duration and trust your internal clock.</Text>
         
         <View style={styles.grid}>
           {DURATIONS.map((d) => {
@@ -71,28 +105,37 @@ export default function HomeScreen({ navigation }: Props) {
                 key={d.label}
                 style={({ pressed }) => [
                   styles.card,
+                  { backgroundColor: colors.surfaceContainerHigh },
                   pressed && { transform: [{ scale: 0.98 }] },
-                  pressed && styles.cardPressed
+                  pressed && { backgroundColor: colors.primaryContainer, ...shadows.glowSelected },
                 ]}
                 onPress={() => handleSelect(d)}
               >
                 {pbValue !== null && pbValue !== undefined && (
-                  <View style={styles.pbBadge}>
-                    <Text style={styles.pbText}>PB: ±{(pbValue / 1000).toFixed(2)}s</Text>
+                  <View style={[styles.pbBadge, { backgroundColor: colors.tertiaryContainer }]}>
+                    <Text style={[styles.pbText, { color: mode === 'dark' ? '#000000' : '#034853' }]}>PB: ±{(pbValue / 1000).toFixed(2)}s</Text>
                   </View>
                 )}
-                <Text style={TYPOGRAPHY.displaySm}>{d.label}</Text>
+                <Text style={[TYPOGRAPHY.displaySm, { color: colors.onSurface }]}>{d.label}</Text>
               </Pressable>
             );
           })}
         </View>
 
-        <Pressable 
-          style={({ pressed }) => [styles.howToPlay, pressed && { opacity: 0.7 }]} 
-          onPress={showHowToPlay}
-        >
-          <Text style={styles.howToPlayText}>ⓘ how to play</Text>
-        </Pressable>
+        <Animated.View style={{ transform: [{ scale: pulseAnim }], alignSelf: 'center', marginTop: 40 }}>
+          <Pressable 
+            style={({ pressed }) => [
+              styles.howToPlay, 
+              { backgroundColor: mode === 'dark' ? 'rgba(171, 163, 255, 0.08)' : 'rgba(45, 105, 87, 0.08)', borderColor: mode === 'dark' ? 'rgba(171, 163, 255, 0.2)' : 'rgba(45, 105, 87, 0.2)' },
+              pressed && { opacity: 0.7, transform: [{ scale: 0.97 }] },
+            ]} 
+            onPress={showHowToPlay}
+          >
+            <MaterialIcons name="info-outline" size={18} color={colors.primary} />
+            <Text style={[styles.howToPlayText, { color: colors.primary }]}>How to play</Text>
+            <MaterialIcons name="chevron-right" size={18} color={colors.primary} />
+          </Pressable>
+        </Animated.View>
       </View>
     </ScreenLayout>
   );
@@ -102,6 +145,7 @@ const styles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    alignItems: 'center',
     paddingHorizontal: 24,
     paddingTop: 16,
   },
@@ -126,40 +170,35 @@ const styles = StyleSheet.create({
   card: {
     width: '45%',
     aspectRatio: 1,
-    backgroundColor: COLORS.surfaceContainerHigh,
-    borderRadius: 24, // md (1.5rem)
+    borderRadius: 24,
     padding: 16,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  cardPressed: {
-    backgroundColor: COLORS.primaryContainer,
-    ...SHADOWS.glowSelected,
   },
   pbBadge: {
     position: 'absolute',
     top: 12,
     left: 12,
-    backgroundColor: COLORS.tertiaryContainer,
-    borderRadius: 16, // pill shape
+    borderRadius: 16,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   pbText: {
     ...TYPOGRAPHY.labelSm,
-    color: '#000000', // max contrast
     fontWeight: 'bold',
   },
   howToPlay: {
-    marginTop: 40,
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    gap: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 30,
+    borderWidth: 1,
   },
   howToPlayText: {
     ...TYPOGRAPHY.bodyMd,
-    color: COLORS.onSurfaceVariant,
-    textTransform: 'uppercase',
-    letterSpacing: 2,
+    fontWeight: '800',
     fontSize: 14,
   }
 });

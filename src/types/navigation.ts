@@ -4,5 +4,5 @@ export type RootStackParamList = {
   PastResults: undefined;
   GetReady: { durationLabel: string; durationMs: number };
   ActiveCounting: { durationLabel: string; durationMs: number };
-  Result: { durationLabel: string; durationMs: number; guessedMs: number };
+  Result: { durationLabel: string; durationMs: number; guessedMs: number; fromHistory?: boolean };
 };
