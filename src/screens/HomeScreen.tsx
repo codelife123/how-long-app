@@ -119,9 +119,9 @@ export default function HomeScreen({ navigation }: Props) {
                 {pbValue !== null && pbValue !== undefined && (
                   <View style={[
                     styles.pbBadge,
-                    { backgroundColor: mode === 'zen' ? colors.surfaceContainer : colors.tertiaryContainer }
+                    { backgroundColor: mode === 'zen' ? colors.primaryContainer : colors.tertiaryContainer }
                   ]}>
-                    <Text style={[styles.pbText, { color: mode === 'zen' ? colors.onSurfaceVariant : '#034853' }]}>
+                    <Text style={[styles.pbText, { color: mode === 'zen' ? colors.primary : '#034853' }]}>
                       PB: ±{(pbValue / 1000).toFixed(2)}s
                     </Text>
                   </View>
