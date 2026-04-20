@@ -18,9 +18,9 @@ interface Props {
 
 const DURATIONS = [
   { label: '10s', ms: 10000 },
+  { label: '20s', ms: 20000 },
   { label: '30s', ms: 30000 },
   { label: '60s', ms: 60000 },
-  { label: '3m', ms: 180000 },
 ];
 
 export default function HomeScreen({ navigation }: Props) {
