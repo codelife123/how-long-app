@@ -22,7 +22,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.z.howlong"
+      "package": "com.zan.howlong"
     },
     "web": {
       "favicon": "./assets/favicon.png"
