@@ -24,21 +24,25 @@ export const DARK_COLORS = {
 };
 
 export const ZEN_COLORS = {
-  background: '#f8fafa',
-  surface: '#f8fafa',
-  surfaceContainerLowest: '#ffffff',
-  surfaceContainerLow: '#f0f4f4',
-  surfaceContainer: '#eaefef',
-  surfaceContainerHigh: '#e3e9ea',
-  surfaceContainerHighest: '#dde4e4',
-  surfaceVariant: 'rgba(221, 228, 228, 0.6)',
-  primary: '#2d6957',
-  primaryContainer: '#b1efd8',
-  primaryDim: '#1f5d4b',
-  onPrimary: '#e4fff3',
-  onSurface: '#2c3435',
-  onSurfaceVariant: '#596061',
-  outlineVariant: 'rgba(172, 179, 180, 0.15)',
+  // ── Surfaces: warm sage-cream instead of cold white ──
+  background: '#f0f4ef',           // warm sage cream — not stark white
+  surface: '#f0f4ef',
+  surfaceContainerLowest: '#f7faf6', // softest cream-white
+  surfaceContainerLow: '#e8ede7',   // gentle sage tint for cards
+  surfaceContainer: '#dfe6de',      // medium sage for grouping
+  surfaceContainerHigh: '#d6dfd5',  // richer sage for interactive tiles
+  surfaceContainerHighest: '#cdd8cc',// deepest sage for pressed/accent states
+  surfaceVariant: 'rgba(180, 201, 178, 0.4)', // translucent sage glass
+  // ── Brand ──
+  primary: '#2d6957',              // deep forest green
+  primaryContainer: '#b1efd8',     // mint green (PB badge, accents)
+  primaryDim: '#1f5d4b',           // darker forest green
+  onPrimary: '#f0faf5',            // soft mint-white on green buttons
+  // ── Text ──
+  onSurface: '#1e2d2a',            // warm dark forest (not cold charcoal)
+  onSurfaceVariant: '#4a5e57',     // warm muted forest green-grey
+  // ── Misc ──
+  outlineVariant: 'rgba(100, 140, 120, 0.15)',
   tertiaryContainer: '#b7eefc',
   error: '#a83836',
   secondary: '#4c645b',
