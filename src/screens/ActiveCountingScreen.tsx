@@ -5,7 +5,7 @@ import { RootStackParamList } from '../types/navigation';
 import { ScreenLayout } from '../components/ScreenLayout';
 import { TYPOGRAPHY } from '../theme/theme';
 import { useTheme } from '../theme/ThemeContext';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../utils/haptics';
 import { useKeepAwake } from 'expo-keep-awake';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ActiveCounting'>;

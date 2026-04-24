@@ -8,7 +8,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { getHistory, HistoryEntry } from '../utils/storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../utils/haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PastResults'>;

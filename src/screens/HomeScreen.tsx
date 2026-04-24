@@ -7,7 +7,7 @@ import { TYPOGRAPHY } from '../theme/theme';
 import { useTheme } from '../theme/ThemeContext';
 import { getPB } from '../utils/storage';
 import { useIsFocused } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../utils/haptics';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -92,13 +92,12 @@ export default function HomeScreen({ navigation }: Props) {
   return (
     <ScreenLayout>
       <View style={styles.topBar}>
-        {/* Theme toggle */}
         <Pressable 
-          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); toggleMode(); }}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); navigation.navigate('Settings'); }}
           style={({pressed}) => [pressed && {opacity: 0.7}]}
         >
           <MaterialIcons 
-            name={mode === 'dark' ? 'light-mode' : 'dark-mode'} 
+            name="settings" 
             size={28} 
             color={colors.primary} 
           />

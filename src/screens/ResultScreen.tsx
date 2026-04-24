@@ -7,7 +7,7 @@ import { TYPOGRAPHY } from '../theme/theme';
 import { useTheme } from '../theme/ThemeContext';
 import { savePB, saveHistory } from '../utils/storage';
 import { processGameResult, AchievementDef, recordShare } from '../utils/achievements';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../utils/haptics';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';

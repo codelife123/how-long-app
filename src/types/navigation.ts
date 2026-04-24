@@ -6,4 +6,5 @@ export type RootStackParamList = {
   ActiveCounting: { durationLabel: string; durationMs: number };
   Result: { durationLabel: string; durationMs: number; guessedMs: number; fromHistory?: boolean };
   Achievements: undefined;
+  Settings: undefined;
 };

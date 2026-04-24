@@ -7,7 +7,7 @@ import { TYPOGRAPHY } from '../theme/theme';
 import { useTheme } from '../theme/ThemeContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../utils/haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getStats, getAchievements, ACHIEVEMENTS, UserStats, UnlockedAchievements, CategoryType, recordShare, AchievementDef } from '../utils/achievements';
 
