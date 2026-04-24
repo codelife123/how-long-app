@@ -9,6 +9,7 @@ import { getPB } from '../utils/storage';
 import { useIsFocused } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -26,6 +27,7 @@ const DURATIONS = [
 export default function HomeScreen({ navigation }: Props) {
   const { colors, shadows, mode, toggleMode } = useTheme();
   const [pbs, setPbs] = useState<Record<string, number | null>>({});
+  const [showWelcome, setShowWelcome] = useState(false);
   const isFocused = useIsFocused();
   const cardBorder = mode === 'dark' ? 'rgba(71, 70, 86, 0.3)' : 'rgba(172, 179, 180, 0.3)';
 
@@ -58,6 +60,13 @@ export default function HomeScreen({ navigation }: Props) {
           loaded[d.label] = await getPB(d.label);
         }
         setPbs(loaded);
+        
+        try {
+          const hasSeen = await AsyncStorage.getItem('@howlong_has_seen_welcome');
+          if (!hasSeen) {
+            setShowWelcome(true);
+          }
+        } catch (e) {}
       };
       load();
     }
@@ -70,6 +79,14 @@ export default function HomeScreen({ navigation }: Props) {
 
   const showHowToPlay = () => {
     navigation.navigate('HowToPlay');
+  };
+
+  const handleCloseWelcome = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setShowWelcome(false);
+    try {
+      await AsyncStorage.setItem('@howlong_has_seen_welcome', 'true');
+    } catch (e) {}
   };
 
   return (
@@ -159,6 +176,29 @@ export default function HomeScreen({ navigation }: Props) {
           </Pressable>
         </Animated.View>
       </View>
+
+      {showWelcome && (
+        <View style={styles.welcomeOverlay}>
+          <View style={[styles.welcomeModal, { backgroundColor: colors.surfaceContainerHigh }]}>
+            <View style={[styles.welcomeIconBg, { backgroundColor: `${colors.primary}1A` }]}>
+               <MaterialIcons name="timer" size={48} color={colors.primary} />
+            </View>
+            <Text style={[TYPOGRAPHY.displaySm, { color: colors.onSurface, textAlign: 'center', marginBottom: 12 }]}>
+              Welcome to How Long
+            </Text>
+            <Text style={[TYPOGRAPHY.bodyLg, { color: colors.onSurfaceVariant, textAlign: 'center', marginBottom: 32 }]}>
+              Test your internal clock. Pick a duration, close your eyes, and tap when you feel the time is up. 
+              {'\n\n'}Can you get perfectly synchronized?
+            </Text>
+            <Pressable 
+              style={({pressed}) => [styles.welcomeBtn, { backgroundColor: colors.primary, ...shadows.glowSelected }, pressed && {transform: [{scale: 0.95}]}]} 
+              onPress={handleCloseWelcome}
+            >
+              <Text style={[TYPOGRAPHY.labelSm, { color: colors.onPrimary, fontWeight: 'bold', fontSize: 16 }]}>Let's Go!</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
     </ScreenLayout>
   );
 }
@@ -232,5 +272,38 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodyMd,
     fontWeight: '800',
     fontSize: 14,
+  },
+  welcomeOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100,
+    padding: 24,
+  },
+  welcomeModal: {
+    width: '100%',
+    borderRadius: 32,
+    padding: 32,
+    alignItems: 'center',
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+  },
+  welcomeIconBg: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  welcomeBtn: {
+    width: '100%',
+    paddingVertical: 18,
+    borderRadius: 30,
+    alignItems: 'center',
   }
 });
