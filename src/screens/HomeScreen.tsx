@@ -87,12 +87,20 @@ export default function HomeScreen({ navigation }: Props) {
           />
         </Pressable>
         <View style={{flex: 1}} />
-        <Pressable 
-          onPress={() => navigation.navigate('PastResults')} 
-          style={({pressed}) => [pressed && {opacity: 0.7}]}
-        >
-          <MaterialIcons name="history" size={28} color={colors.primary} />
-        </Pressable>
+        <View style={styles.topBarActions}>
+          <Pressable 
+            onPress={() => navigation.navigate('Achievements')} 
+            style={({pressed}) => [pressed && {opacity: 0.7}, { marginRight: 16 }]}
+          >
+            <MaterialIcons name="emoji-events" size={28} color={colors.primary} />
+          </Pressable>
+          <Pressable 
+            onPress={() => navigation.navigate('PastResults')} 
+            style={({pressed}) => [pressed && {opacity: 0.7}]}
+          >
+            <MaterialIcons name="history" size={28} color={colors.primary} />
+          </Pressable>
+        </View>
       </View>
       <View style={styles.content}>
         <Text style={[TYPOGRAPHY.headlineLg, styles.title, { color: colors.onSurface }]}>How Long?</Text>
@@ -162,6 +170,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingTop: 16,
+  },
+  topBarActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   content: {
     flex: 1,

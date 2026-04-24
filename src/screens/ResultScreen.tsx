@@ -6,6 +6,7 @@ import { ScreenLayout } from '../components/ScreenLayout';
 import { TYPOGRAPHY } from '../theme/theme';
 import { useTheme } from '../theme/ThemeContext';
 import { savePB, saveHistory } from '../utils/storage';
+import { processGameResult, AchievementDef, recordShare } from '../utils/achievements';
 import * as Haptics from 'expo-haptics';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -21,6 +22,8 @@ export default function ResultScreen({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();
   const { durationLabel, durationMs, guessedMs, fromHistory } = route.params;
   const [isPB, setIsPB] = useState(false);
+  const [unlockedAchievements, setUnlockedAchievements] = useState<AchievementDef[]>([]);
+  const [showAchievementModal, setShowAchievementModal] = useState(false);
   const shareRef = useRef<ViewShot>(null);
 
   const diffMs = guessedMs - durationMs;
@@ -76,6 +79,15 @@ export default function ResultScreen({ navigation, route }: Props) {
           }, 400);
         }
         await saveHistory({ durationLabel, durationMs, guessedMs });
+
+        const newlyUnlocked = await processGameResult(durationMs, absDiff);
+        if (newlyUnlocked.length > 0) {
+          setUnlockedAchievements(newlyUnlocked);
+          setTimeout(() => {
+            setShowAchievementModal(true);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          }, isPB ? 2000 : 800); // delay so it doesn't overlap immediately with PB celebration
+        }
       };
       handleSave();
     }
@@ -107,6 +119,14 @@ export default function ResultScreen({ navigation, route }: Props) {
             mimeType: 'image/png',
             dialogTitle: 'Share your result',
           });
+          const newlyUnlocked = await recordShare('result');
+          if (newlyUnlocked.length > 0) {
+            setUnlockedAchievements(newlyUnlocked);
+            setTimeout(() => {
+              setShowAchievementModal(true);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            }, 1000);
+          }
         }
       }
     } catch (e) {
@@ -303,6 +323,43 @@ export default function ResultScreen({ navigation, route }: Props) {
           fallSpeed={2500}
           explosionSpeed={350}
         />
+      )}
+
+      {showAchievementModal && unlockedAchievements[0] && (
+        <View style={styles.achievementOverlay}>
+          <Animated.View style={[
+            styles.achievementModal, 
+            { backgroundColor: colors.surfaceContainerHigh, borderColor: unlockedAchievements[0].color }
+          ]}>
+            <View style={[styles.achievementIconBg, { backgroundColor: `${unlockedAchievements[0].color}1A` }]}>
+              <MaterialIcons name={unlockedAchievements[0].icon} size={64} color={unlockedAchievements[0].color} />
+            </View>
+            <Text style={[styles.achievementTitle, { color: colors.onSurface }]}>Achievement Unlocked!</Text>
+            <Text style={[styles.achievementName, { color: unlockedAchievements[0].color }]}>{unlockedAchievements[0].title}</Text>
+            <Text style={[styles.achievementDesc, { color: colors.onSurfaceVariant }]}>{unlockedAchievements[0].description}</Text>
+            
+            <Pressable 
+              style={({pressed}) => [styles.achievementBtn, { backgroundColor: colors.primary }, pressed && {transform: [{scale: 0.95}]}]}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                if (unlockedAchievements.length > 1) {
+                  setUnlockedAchievements(prev => prev.slice(1));
+                } else {
+                  setShowAchievementModal(false);
+                }
+              }}
+            >
+              <Text style={[styles.achievementBtnText, { color: colors.onPrimary }]}>Awesome</Text>
+            </Pressable>
+          </Animated.View>
+          <ConfettiCannon
+            count={50}
+            origin={{x: 200, y: 0}}
+            colors={[unlockedAchievements[0].color, '#ffffff']}
+            fallSpeed={3000}
+            fadeOut={true}
+          />
+        </View>
       )}
     </ScreenLayout>
   );
@@ -614,5 +671,64 @@ const styles = StyleSheet.create({
   btnPrimaryText: {
     ...TYPOGRAPHY.bodyMd,
     fontWeight: 'bold',
+  },
+  achievementOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100,
+    padding: 24,
+  },
+  achievementModal: {
+    width: '100%',
+    borderRadius: 32,
+    padding: 32,
+    alignItems: 'center',
+    borderWidth: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 20,
+  },
+  achievementIconBg: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  achievementTitle: {
+    ...TYPOGRAPHY.labelSm,
+    fontSize: 14,
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+    marginBottom: 8,
+    opacity: 0.8,
+  },
+  achievementName: {
+    ...TYPOGRAPHY.displaySm,
+    fontSize: 28,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  achievementDesc: {
+    ...TYPOGRAPHY.bodyMd,
+    textAlign: 'center',
+    marginBottom: 32,
+  },
+  achievementBtn: {
+    paddingHorizontal: 40,
+    paddingVertical: 16,
+    borderRadius: 30,
+    width: '100%',
+    alignItems: 'center',
+  },
+  achievementBtnText: {
+    ...TYPOGRAPHY.labelSm,
+    fontWeight: 'bold',
+    fontSize: 16,
   }
 });

@@ -24,6 +24,7 @@ import ActiveCountingScreen from './src/screens/ActiveCountingScreen';
 import ResultScreen from './src/screens/ResultScreen';
 import HowToPlayScreen from './src/screens/HowToPlayScreen';
 import PastResultsScreen from './src/screens/PastResultsScreen';
+import AchievementsScreen from './src/screens/AchievementsScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -46,6 +47,7 @@ function AppNavigator() {
         <Stack.Screen name="GetReady" component={GetReadyScreen} />
         <Stack.Screen name="ActiveCounting" component={ActiveCountingScreen} />
         <Stack.Screen name="Result" component={ResultScreen} />
+        <Stack.Screen name="Achievements" component={AchievementsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
