@@ -6,6 +6,7 @@ import { ScreenLayout } from '../components/ScreenLayout';
 import { TYPOGRAPHY } from '../theme/theme';
 import { useTheme } from '../theme/ThemeContext';
 import * as Haptics from 'expo-haptics';
+import { useKeepAwake } from 'expo-keep-awake';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ActiveCounting'>;
 
@@ -13,6 +14,8 @@ export default function ActiveCountingScreen({ navigation, route }: Props) {
   const { colors } = useTheme();
   const { durationLabel, durationMs } = route.params;
   const startTime = useRef<number>(0);
+
+  useKeepAwake();
 
   useEffect(() => {
     // Reset start time on mount
