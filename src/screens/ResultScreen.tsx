@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated, Easing, Platform } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Animated, Easing, Platform, ScrollView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { ScreenLayout } from '../components/ScreenLayout';
@@ -242,7 +242,11 @@ export default function ResultScreen({ navigation, route }: Props) {
         </Pressable>
       </View>
 
-      <View style={styles.content}>
+      <ScrollView 
+        style={{ flex: 1, width: '100%' }}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         
         {isPB ? (
           <Animated.View style={[styles.pbBanner, { backgroundColor: colors.tertiaryContainer, shadowColor: colors.tertiaryContainer, transform: [{ scale: pbPulseScale }] }]}>
@@ -292,7 +296,7 @@ export default function ResultScreen({ navigation, route }: Props) {
         <View style={styles.analysisContainer}>
            <Text style={[styles.analysisText, { color: colors.onSurfaceVariant }]}>{insightMessage}</Text>
         </View>
-      </View>
+      </ScrollView>
 
       <View style={[styles.footer, { backgroundColor: colors.background, paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
         {fromHistory ? (
@@ -531,10 +535,11 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   content: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 20,
     alignItems: 'center',
+    paddingBottom: 40,
   },
   pbBanner: {
     paddingHorizontal: 24,
@@ -637,10 +642,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     flexDirection: 'row',
     justifyContent: 'center',
     padding: 24,
