@@ -9,11 +9,13 @@ import { getHistory, HistoryEntry } from '../utils/storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PastResults'>;
 
 export default function PastResultsScreen({ navigation }: Props) {
   const { colors, shadows, mode } = useTheme();
+  const insets = useSafeAreaInsets();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const isFocused = useIsFocused();
 
@@ -124,7 +126,7 @@ export default function PastResultsScreen({ navigation }: Props) {
         )}
       </ScrollView>
 
-      <View style={[styles.footer, { backgroundColor: colors.background }]}>
+      <View style={[styles.footer, { backgroundColor: colors.background, paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
         <Pressable style={({pressed}) => [styles.backBtn, { backgroundColor: colors.primary, ...shadows.glowSelected }, pressed && {transform: [{scale: 0.95}]}]} onPress={handleClose}>
           <Text style={[styles.backBtnText, { color: colors.onPrimary }]}>Back to Timer</Text>
           <MaterialIcons name="close" size={24} color={colors.onPrimary} />

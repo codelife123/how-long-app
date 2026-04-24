@@ -12,11 +12,13 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import ViewShot from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 
 export default function ResultScreen({ navigation, route }: Props) {
   const { colors, shadows, mode } = useTheme();
+  const insets = useSafeAreaInsets();
   const { durationLabel, durationMs, guessedMs, fromHistory } = route.params;
   const [isPB, setIsPB] = useState(false);
   const shareRef = useRef<ViewShot>(null);
@@ -272,7 +274,7 @@ export default function ResultScreen({ navigation, route }: Props) {
         </View>
       </View>
 
-      <View style={[styles.footer, { backgroundColor: colors.background }]}>
+      <View style={[styles.footer, { backgroundColor: colors.background, paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
         {fromHistory ? (
           <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); navigation.goBack(); }} style={({pressed}) => [styles.btnPrimary, { backgroundColor: colors.primary, ...shadows.glowSelected, flex: 1 }, pressed && {transform: [{scale: 0.95}]}]}>
             <MaterialIcons name="arrow-back" size={20} color={colors.onPrimary} />

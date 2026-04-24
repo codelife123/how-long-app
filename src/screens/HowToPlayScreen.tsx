@@ -7,11 +7,13 @@ import { TYPOGRAPHY } from '../theme/theme';
 import { useTheme } from '../theme/ThemeContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'HowToPlay'>;
 
 export default function HowToPlayScreen({ navigation }: Props) {
   const { colors, shadows, mode } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const handleGotIt = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -67,7 +69,7 @@ export default function HowToPlayScreen({ navigation }: Props) {
         </View>
       </ScrollView>
 
-      <View style={[styles.footer, { backgroundColor: colors.surface }]}>
+      <View style={[styles.footer, { backgroundColor: colors.surface, paddingBottom: Math.max(insets.bottom, 24) + 16 }]}>
         <Pressable 
           style={({ pressed }) => [
             styles.gotItButton,

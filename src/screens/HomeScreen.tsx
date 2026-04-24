@@ -27,6 +27,7 @@ export default function HomeScreen({ navigation }: Props) {
   const { colors, shadows, mode, toggleMode } = useTheme();
   const [pbs, setPbs] = useState<Record<string, number | null>>({});
   const isFocused = useIsFocused();
+  const cardBorder = mode === 'dark' ? 'rgba(71, 70, 86, 0.3)' : 'rgba(172, 179, 180, 0.3)';
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -105,8 +106,12 @@ export default function HomeScreen({ navigation }: Props) {
                 key={d.label}
                 style={({ pressed }) => [
                   styles.card,
-                  // Zen: surface-container-low (#f0f4f4), Dark: surfaceContainerHigh
-                  { backgroundColor: mode === 'zen' ? colors.surfaceContainerLow : colors.surfaceContainerHigh },
+                  // Zen uses surfaceVariant with a border, Dark uses surfaceContainerHigh
+                  { 
+                    backgroundColor: mode === 'zen' ? colors.surfaceVariant : colors.surfaceContainerHigh,
+                    borderWidth: mode === 'zen' ? 1 : 0,
+                    borderColor: mode === 'zen' ? cardBorder : 'transparent'
+                  },
                   pressed && { transform: [{ scale: 0.98 }] },
                   pressed && { backgroundColor: mode === 'zen' ? colors.surfaceContainerHighest : colors.primaryContainer, ...shadows.glowSelected },
                 ]}
